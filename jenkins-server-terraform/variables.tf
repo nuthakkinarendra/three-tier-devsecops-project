@@ -2,7 +2,7 @@
 
 variable "region" {
   description = "The AWS region to create resources in."
-  default     = "us-west-2"
+  default     = "ap-south-1"
 }
 
 # Networking Configuration
@@ -58,5 +58,5 @@ variable "key_name" {
 
 variable "iam_role_name" {
   description = "The IAM role name for jenkins instance."
-  default     = "jenkins-server-iam-role"
+  default     = "jenkins-server-iam-role1"
 }

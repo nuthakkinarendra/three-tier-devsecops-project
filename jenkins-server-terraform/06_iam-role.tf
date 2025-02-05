@@ -17,7 +17,7 @@ EOF
 }
 
 resource "aws_iam_policy" "ecr_access_policy" {
-  name        = "ECRAccessPolicy"
+  name        = "ECRAccessPolicynari"
   description = "Policy to allow EC2 to access ECR"
   policy      = <<EOF
 {

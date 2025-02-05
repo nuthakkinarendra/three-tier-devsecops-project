@@ -9,7 +9,7 @@ resource "aws_instance" "ec2" {
   instance_type          = var.instance_type  # parameterized for flexibility
   
   # The key pair name for SSH access to the instance
-  key_name               = var.key_name
+  key_name               = "devsecops-project"
   
   # Subnet ID where the EC2 instance will be launched (usually public subnet)
   subnet_id              = aws_subnet.public-subnet.id
