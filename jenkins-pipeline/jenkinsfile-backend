@@ -8,7 +8,7 @@ pipeline {
         SCANNER_HOME=tool 'sonar-scanner'
         AWS_ACCOUNT_ID = credentials('ACCOUNT_ID')
         AWS_ECR_REPO_NAME = credentials('ECR_REPO_BACKEND')
-        AWS_DEFAULT_REGION = 'us-west-2'
+        AWS_DEFAULT_REGION = 'ap-south-1'
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/"
     }
     stages {
@@ -19,7 +19,7 @@ pipeline {
         }
         stage('Checkout from Git') {
             steps {
-                git branch: 'main', credentialsId: 'GITHUB', url: 'https://github.com/codewithmuh/three-tier-devsecops-project.git'
+                git branch: 'main', credentialsId: 'GITHUB', url: 'https://github.com/nuthakkinarendra/three-tier-devsecops-project.git'
             }
         }
         stage('Sonarqube Analysis') {
@@ -27,6 +27,7 @@ pipeline {
                 dir('app-code/backend') {
                     withSonarQubeEnv('sonar-server') {
                         sh ''' 
+                            $SCANNER_HOME/bin/sonar-scanner \
                            -Dsonar.projectKey=backend \
                            -Dsonar.sources=. \
                            -Dsonar.host.url= http://13.235.114.215:9000 \
@@ -39,7 +40,7 @@ pipeline {
         stage('Quality Check') {
             steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
+                    waitForQualityGate abortPipeline: false, credentialsId: 'SONAR_TOKEN' 
                 }
             }
         }
@@ -85,20 +86,20 @@ pipeline {
         }
         stage('Checkout Code') {
             steps {
-                git branch: 'main', credentialsId: 'GITHUB', url: 'https://github.com/codewithmuh/three-tier-devsecops-project.git'
+                git branch: 'main', credentialsId: 'GITHUB', url: 'https://github.com/nuthakkinarendra/three-tier-devsecops-project.git'
             }
         }
         stage('Update Deployment file') {
             environment {
                 GIT_REPO_NAME = "three-tier-devsecops-project"
-                GIT_USER_NAME = "codewithmuh"
+                GIT_USER_NAME = "nuthakkinarendra"
             }
             steps {
                 dir('kubernetes-manifests/backend') {
                     withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
                         sh '''
-                            git config user.email "rashiddaha80@gmail.com"
-                            git config user.name "codewithmuh"
+                            git config user.email "nuthakkinarendra92@gmail.com"
+                            git config user.name "nuthakkinarendra"
                             BUILD_NUMBER=${BUILD_NUMBER}
                             echo $BUILD_NUMBER
                             imageTag=$(grep -oP '(?<=backend:)[^ ]+' deployment.yaml)
@@ -114,3 +115,5 @@ pipeline {
         }
     }
 }
+
+
