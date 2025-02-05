@@ -28,10 +28,10 @@ pipeline {
                     withSonarQubeEnv('sonar-server') {
                         sh ''' 
                             $SCANNER_HOME/bin/sonar-scanner \
-                           -Dsonar.projectKey=backend \
-                           -Dsonar.sources=. \
-                           -Dsonar.host.url=http://13.235.114.215:9000 \
-                           -Dsonar.login=sqp_93ffd2923dab125cce93afe6e43a3744080665b9
+                            -Dsonar.projectKey=backend \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=http://13.235.114.215:9000 \
+                            -Dsonar.login=sqp_93ffd2923dab125cce93afe6e43a3744080665b9
                         '''
                     }
                 }
@@ -40,7 +40,7 @@ pipeline {
         stage('Quality Check') {
             steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'SONAR_TOKEN' 
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
                 }
             }
         }
