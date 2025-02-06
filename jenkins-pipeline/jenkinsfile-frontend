@@ -8,7 +8,7 @@ pipeline {
         SCANNER_HOME=tool 'sonar-scanner'
         AWS_ACCOUNT_ID = credentials('ACCOUNT_ID')
         AWS_ECR_REPO_NAME = credentials('ECR_REPO_FRONTEND')
-        AWS_DEFAULT_REGION = 'us-west-2'
+        AWS_DEFAULT_REGION = 'ap-south-1'
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/"
     }
     stages {
@@ -19,7 +19,7 @@ pipeline {
         }
         stage('Checkout from Git') {
             steps {
-                git branch: 'main', credentialsId: 'GITHUB', url: 'https://github.com/codewithmuh/three-tier-devsecops-project.git'
+                git branch: 'main', credentialsId: 'GITHUB', url: 'https://github.com/nuthakkinarendra/three-tier-devsecops-project.git'
             }
         }
         stage('Sonarqube Analysis') {
@@ -27,10 +27,11 @@ pipeline {
                 dir('app-code/frontend/notes-frontend') {
                     withSonarQubeEnv('sonar-server') {
                         sh ''' 
-                           -Dsonar.projectKey=frontend \
-                           -Dsonar.sources=. \
-                           -Dsonar.host.url=http://13.235.114.215:9000 \
-                           -Dsonar.login=sqp_6e617b6c98db751f1839a70fe98a5478a02f1dec
+                            $SCANNER_HOME/bin/sonar-scanner \
+                            -Dsonar.projectKey=frontend \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=http://13.235.114.215:9000 \
+                            -Dsonar.login=sqp_3fba668454d4f1c5e373d7391de961203e6452cb
                         '''
                     }
                 }
@@ -85,13 +86,13 @@ pipeline {
         }
         stage('Checkout Code') {
             steps {
-                git branch: 'main', credentialsId: 'GITHUB', url: 'https://github.com/codewithmuh/three-tier-devsecops-project.git'
+                git branch: 'main', credentialsId: 'GITHUB', url: 'https://github.com/nuthakkinarendra/three-tier-devsecops-project.git'
             }
         }
         stage('Update Deployment file') {
             environment {
                 GIT_REPO_NAME = "three-tier-devsecops-project"
-                GIT_USER_NAME = "codewithmuh"
+                GIT_USER_NAME = "nuthakkinarendra"
             }
             steps {
                 dir('kubernetes-manifests/frontend') {

@@ -211,130 +211,241 @@ Open Sonarrqube in the browser.
 
 http://<jenkins-server-public-ip>:9090 
 
+![priview](./images/1.png)
+
 username and password for sonarqube is admin. 
 
- 
+ ![priview](./images/2.png)
 
 Next, We have to perform 5 Steps on the sonarqube setup. 
 
 Setup of frontend project for code analysis 
-
+![priview](./images/4.png)
 Setup of backend project for code analysis 
 
 Replace the keys in jenkins-pipeline folder, you got from the above two steps. (watch video sonarqube setup) 
 
 create a sonar-token, and save it somewhere for later use in Jenkins. 
 
+![priview](./images/5.png)
+![priview](./images/6.png)
+![priview](./images/7.png)
+![priview](./images/8.png)
+![priview](./images/9.png)
 create a webhook on the sonarqube dashboard. (http://<jenkins-ec2-server-public-ip>:8080/sonarqube-webhook/) 
 
  
 
 7. Amazon ECR Repositories 
 
+![priview](./images/10.png)
+
 Create two repositories, one for the backend and front end. 
 
- 
+ ![priview](./images/11.png)
+
+ ![priview](./images/12.png)
+
+  ![priview](./images/13.png)
+
+   ![priview](./images/14.png)
 
  
 
 Login to ECR on the Jenkins server, using the ECR push command. 
 
- 
+ ![priview](./images/14.png)
 
+![priview](./images/15.png)
  
 
  
 
 7a. Add Cred. in Jenkins 
 
+![priview](./images/15.png)
+
+
+![priview](./images/16.png)
+
+
+![priview](./images/17.png)
+
+
+![priview](./images/18.png)
  
 
 Got to Manage Jenkins -> Credentials. 
 
+![priview](./images/19.png)
+
 We have to add here a total of 7 Credentials. 
 
-aws-key 
+![priview](./images/20.png)
 
- 
+![priview](./images/21.png)
+
+![priview](./images/22.png)
+
+![priview](./images/23.png)
+
+![priview](./images/24.png)
+
+![priview](./images/25.png)
+
+aws-key 
+![priview](./images/25.png)
 
 GITHUB (username & Password) 
 
- 
 
+
+ ![priview](./images/27.png)
+ 
 github (secret text) 
 
  
 
 sonar-token 
+   ![priview](./images/26.png)
 
+  
  
 
  
 
 ECR_REPO_FRONTEND 
 
- 
+![priview](./images/27.png)
+
 
 ECR_REPO_BACKEND 
 
+![priview](./images/28.png)
  
 
-ACCOUNT_ID (aws account id)         
+ACCOUNT_ID (aws account id)   
 
+![priview](./images/29.png)
+
+
+
+Now We have to configure the installed plugins.
+ (important) 
+
+ ![priview](./images/56.png)
  
-
-Now We have to configure the installed plugins. (important) 
 
 In Tools, We have to configure JDK, sonar-scanner, nodejs, DP-Check, and docker. 
+
+![priview](./images/30.png)
+
+  ![priview](./images/31.png)
+
+ ![priview](./images/32.png)
+
+ ![priview](./images/33.png)
+
+ ![priview](./images/34.png)
+
+ ![priview](./images/35.png)
+
+ ![priview](./images/36.png)
+
+ ![priview](./images/37.png)
+
+ ![priview](./images/38.png)
+
+ ![priview](./images/39.png)
+
+
+ 
 
 Go to Dashboard -> Manage Jenkins -> System 
 
 Search for SonarQube installations 
+ ![priview](./images/40.png)
 
 Provide the name as it is, then in the Server URL copy the sonarqube public IP (same as Jenkins) with port 9000 select the sonar token that we have added recently, and click on Apply & Save. 
 
-8. EKS Cluster Deployment 
+8. EKS Cluster Deployment
+
+ 
 
 We have to create EKS Cluster using the below commands. 
 
- eksctl create cluster --name three-tier-k8s-eks-cluster --region us-west-2 --node-type t2.medium --nodes-min 2 --nodes-max 2         
+ eksctl create cluster --name three-tier-k8s-eks-cluster --region us-west-2 --node-type t2.medium --nodes-min 2 --nodes-max 2 
+
+ ![priview](./images/41.png)  
+
+ 
 
 Once the cluster is ready, you can validate if the nodes are ready or not. 
 
-kubectl get nodes         
+kubectl get nodes  
+
+ ![priview](./images/42.png)       
 
 Now, we will configure the Load Balancer on our EKS because our application will have an ingress controller. 
+
+
 
 Download the policy for the LoadBalancer prerequisite. 
 
 curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/install/iam_policy.json         
 
+ ![priview](./images/43.png)
+
+  
+
 Create the IAM policy using the below command 
 
-aws iam create-policy --policy-name AWSLoadBalancerControllerIAMPolicy --policy-document file://iam_policy.json         
+aws iam create-policy --policy-name AWSLoadBalancerControllerIAMPolicy --policy-document file://iam_policy.json   
+
+![priview](./images/44.png)
+
+
 
 Create OIDC Provider 
 
-eksctl utils associate-iam-oidc-provider --region=us-west-2 --cluster=three-tier-k8s-eks-cluster --approve         
+
+eksctl utils associate-iam-oidc-provider --region=us-west-2 --cluster=three-tier-k8s-eks-cluster --approve   
+
+
 
 Create a Service Account by using below command and replace your account ID with your one 
 
-eksctl create iamserviceaccount --cluster=my-three-tier-k8s-eks-cluster --namespace=kube-system --name=aws-load-balancer-controller --role-name AmazonEKSLoadBalancerControllerRole --attach-policy-arn=arn:aws:iam::<your-account-id>:policy/AWSLoadBalancerControllerIAMPolicy --approve --region=us-west-2         
+eksctl create iamserviceaccount --cluster=my-three-tier-k8s-eks-cluster --namespace=kube-system --name=aws-load-balancer-controller --role-name AmazonEKSLoadBalancerControllerRole --attach-policy-arn=arn:aws:iam::<your-account-id>:policy/AWSLoadBalancerControllerIAMPolicy --approve --region=us-west-2    
+
+![priview](./images/46.png)
 
 Run the below command to deploy the AWS Load Balancer Controller 
 
 helm repo add eks https://aws.github.io/eks-charts 
 
+![priview](./images/47.png)
+
 helm repo update eks 
 
-helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=three-tier-k8s-eks-cluster --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller         
+![priview](./images/48.png)
+
+
+
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=three-tier-k8s-eks-cluster --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller   
+
+![priview](./images/49.png)
 
 After 2-3 minutes, run the command below to check whether your pods are running or not. 
 
-kubectl get deployment -n kube-system aws-load-balancer-controller         
+kubectl get deployment -n kube-system aws-load-balancer-controller   
 
- 
+![priview](./images/49.png)
 
+ ![priview](./images/50.png)
+
+ ![priview](./images/51.png)
+
+![priview](./images/52.png)
  
 
 9. Prometheus and Grafana Installation and Configuration 
@@ -353,11 +464,41 @@ helm repo add stable https://charts.helm.sh/stable
 
 2. Add Prometheus Community Helm Repository 
 
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts         
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts  
+
+![priview](./images/52.png)
 
 Step 2: Create a Namespace for monitoring 
 
-kubectl create namespace monitoring         
+ ![priview](./images/53.png)
+
+ ![priview](./images/54.png)
+
+  ![priview](./images/55.png)
+
+  
+
+kubectl create namespace monitoring 
+
+![priview](./images/57.png)
+
+![priview](./images/58.png)
+
+![priview](./images/59.png)
+
+![priview](./images/60.png)
+
+![priview](./images/61.png)
+
+![priview](./images/62.png)
+
+![priview](./images/63.png)
+
+![priview](./images/64.png)
+
+![priview](./images/65.png)
+
+![priview](./images/66.png)
 
 Step 3: Install Prometheus with Grafana using Helm 
 
@@ -413,6 +554,20 @@ step of the Grafana dashboard with Prometheus as explained in the video.
 
 9. Jenkins Pipelines (Frontend & Backend) 
 
+![priview](./images/65.png)
+
+![priview](./images/84.png)
+
+![priview](./images/85.png)
+
+![priview](./images/86.png)
+
+
+
+
+
+
+
 This step do not include any commands, you can watch it in my video. 
 
  
@@ -465,7 +620,43 @@ export ARGOCD_SERVER=$(kubectl get svc argocd-server -n argocd -o json | jq -r '
 
 Next will deploy our Three-Tier Application using ArgoCD 
 
-As our repository is private. So, we need to configure the Private Repository in ArgoCD. 
+As our repository is private. So, we need to configure the Private Repository in ArgoCD.
+
+![priview](./images/68.png)
+
+![priview](./images/69.png)
+
+![priview](./images/70.png)
+
+![priview](./images/71.png)
+
+![priview](./images/72.png)
+
+![priview](./images/73.png)
+
+![priview](./images/74.png)
+
+![priview](./images/75.png)
+
+![priview](./images/76.png)
+
+![priview](./images/77.png)
+
+
+![priview](./images/78.png)
+
+![priview](./images/79.png)
+
+![priview](./images/80.png)
+
+![priview](./images/81.png)
+
+![priview](./images/82.png)
+
+![priview](./images/83.png)
+
+![priview](./images/84.png)
+
 
 Then We have to set up applications. 
 
